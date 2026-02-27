@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Distribucions de Probabilitat</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['\\(','\\)']],
+    displayMath: [['\\[','\\]']],
+    tags: 'none'
+  },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+<style>
+:root {
+  --ink: #1c1c2e;
+  --paper: #f7f4ef;
+  --accent: #c0392b;
+  --accent2: #2471a3;
+  --accent3: #1e8449;
+  --gold: #d4a017;
+  --muted: #6c757d;
+  --border: #ddd8cf;
+  --theory-bg: #eaf2fb;
+  --theory-border: #2471a3;
+  --example-bg: #fef9ec;
+  --example-border: #d4a017;
+  --exercise-bg: #eafaf1;
+  --exercise-border: #1e8449;
+  --formula-bg: #1c1c2e;
+  --card: #ffffff;
+  --warning-bg: #fdf2f8;
+  --warning-border: #8e44ad;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Source Sans 3', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 16.5px;
+  line-height: 1.8;
+}
+
+/* ─── SIDEBAR ─── */
+#sidebar {
+  position: fixed;
+  top: 0; left: 0;
+  width: 270px;
+  height: 100vh;
+  background: var(--ink);
+  overflow-y: auto;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+}
+#sidebar::-webkit-scrollbar { width: 4px; }
+#sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+.sidebar-header {
+  padding: 32px 22px 22px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.sidebar-header .book-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.sidebar-header h1 {
+  font-family: 'Playfair Display', serif;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.sidebar-header .subtitle {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.4);
+}
+
+.nav-group { padding: 14px 0 4px; }
+.nav-group-label {
+  padding: 0 22px 6px;
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.28);
+  font-weight: 600;
+}
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 22px;
+  color: rgba(255,255,255,0.58);
+  text-decoration: none;
+  font-size: 0.855rem;
+  border-left: 3px solid transparent;
+  transition: all 0.18s;
+}
+.nav-link:hover { color: #fff; background: rgba(255,255,255,0.05); border-left-color: var(--gold); }
+.nav-link.active { color: #fff; background: rgba(255,255,255,0.07); border-left-color: var(--gold); }
+.nav-link .nav-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--gold);
+  opacity: 0.7;
+  min-width: 20px;
+}
+
+/* ─── MAIN ─── */
+#main { margin-left: 270px; min-height: 100vh; }
+
+/* ─── HERO ─── */
+.hero {
+  background: var(--ink);
+  color: white;
+  padding: 80px 72px 72px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::after {
+  content: 'P(X)';
+  position: absolute;
+  right: 60px; bottom: -20px;
+  font-family: 'Playfair Display', serif;
+  font-size: 11rem; font-weight: 900;
+  color: rgba(255,255,255,0.03);
+  line-height: 1; pointer-events: none;
+}
+.hero-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem; font-weight: 900;
+  line-height: 1.15; margin-bottom: 20px;
+  max-width: 600px;
+}
+.hero p {
+  font-size: 1.05rem;
+  color: rgba(255,255,255,0.6);
+  max-width: 520px; line-height: 1.7;
+}
+.hero-chips { display: flex; gap: 10px; margin-top: 30px; flex-wrap: wrap; }
+.chip {
+  padding: 5px 16px; border-radius: 20px;
+  font-size: 0.82rem; font-weight: 600;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: opacity 0.2s;
+  cursor: pointer;
+}
+.chip:hover { opacity: 0.8; }
+.chip-blue { background: rgba(36,113,163,0.35); color: #7ec8f0; }
+.chip-red  { background: rgba(192,57,43,0.35);  color: #f08070; }
+.chip-green{ background: rgba(30,132,73,0.35);  color: #7ed9a0; }
+
+/* ─── CONTENT ─── */
+.content { padding: 60px 72px; max-width: 900px; }
+
+/* ─── SECTION HEADER ─── */
+.section-header {
+  margin: 64px 0 32px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--border);
+  position: relative;
+}
+.section-header::before {
+  content: '';
+  position: absolute; bottom: -2px; left: 0;
+  width: 60px; height: 2px;
+  background: var(--accent);
+}
+.section-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem; color: var(--accent);
+  letter-spacing: 0.1em; text-transform: uppercase;
+  font-weight: 600; margin-bottom: 8px;
+}
+.section-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem; font-weight: 700;
+  color: var(--ink); line-height: 1.2;
+}
+.subsection-header { margin: 40px 0 18px; }
+.subsection-header h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem; font-weight: 700;
+  color: var(--ink);
+  border-left: 4px solid var(--accent2);
+  padding-left: 14px;
+}
+
+p { margin-bottom: 16px; }
+
+/* ─── THEORY BOX ─── */
+.theory-box {
+  background: var(--theory-bg);
+  border-left: 4px solid var(--theory-border);
+  border-radius: 0 10px 10px 0;
+  padding: 22px 26px; margin: 24px 0;
+}
+.theory-box .box-label {
+  font-size: 0.68rem; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--theory-border);
+  font-weight: 600; margin-bottom: 10px;
+}
+
+/* ─── DEF LIST ─── */
+.def-list { list-style: none; margin: 10px 0; }
+.def-list li {
+  display: flex; align-items: flex-start;
+  gap: 12px; padding: 7px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  font-size: 0.96rem;
+}
+.def-list li:last-child { border-bottom: none; }
+.def-list .def-key {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600; color: var(--accent2);
+  min-width: 28px; font-size: 0.9rem; padding-top: 2px;
+}
+.def-list .def-arrow { color: var(--muted); font-size: 0.85rem; padding-top: 3px; }
+
+/* ─── FORMULA BOX ─── */
+.formula-box {
+  background: var(--formula-bg);
+  border-radius: 12px;
+  padding: 28px 32px; margin: 28px 0;
+  position: relative; overflow: hidden;
+}
+.formula-box::before {
+  content: '∑';
+  position: absolute; right: 20px; top: -10px;
+  font-size: 5rem; color: rgba(255,255,255,0.04);
+  font-family: serif; pointer-events: none;
+}
+.formula-box .formula-label {
+  font-size: 0.67rem; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--gold);
+  font-weight: 600; margin-bottom: 18px;
+}
+.formula-box .mjx-chtml,
+.formula-box .MathJax { color: #fff !important; }
+.formula-box .formula-display {
+  color: #fff;
+  margin: 8px 0 16px;
+  font-size: 1.1rem;
+}
+.formula-box .formula-parts {
+  display: flex; flex-wrap: wrap;
+  gap: 12px; margin-top: 14px;
+}
+.formula-part {
+  background: rgba(255,255,255,0.07);
+  border-radius: 8px; padding: 8px 14px;
+  font-size: 0.82rem; color: rgba(255,255,255,0.7);
+}
+.formula-part strong {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--gold); margin-right: 4px;
+}
+
+/* ─── EXAMPLE BOX ─── */
+.example-box {
+  background: var(--example-bg);
+  border: 1.5px solid var(--example-border);
+  border-radius: 12px; padding: 24px 28px; margin: 28px 0;
+}
+.example-box .box-label {
+  font-size: 0.68rem; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--gold);
+  font-weight: 700; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.example-box .box-label::before { content: '★'; font-size: 0.75rem; }
+.example-box .example-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem; font-weight: 700;
+  margin-bottom: 14px; color: var(--ink);
+}
+.example-box .example-statement {
+  background: rgba(212,160,23,0.1);
+  border-radius: 8px; padding: 12px 16px;
+  margin-bottom: 16px; font-style: italic; font-size: 0.95rem;
+}
+
+.solution-steps { list-style: none; counter-reset: step; }
+.solution-steps li {
+  counter-increment: step;
+  display: flex; gap: 14px;
+  margin-bottom: 12px; align-items: flex-start;
+}
+.solution-steps li::before {
+  content: counter(step);
+  background: var(--gold); color: white;
+  width: 24px; height: 24px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 700; flex-shrink: 0; margin-top: 2px;
+}
+
+.inline-formula {
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(0,0,0,0.07);
+  padding: 2px 7px; border-radius: 5px;
+  font-size: 0.9em; color: var(--ink);
+}
+.result-highlight {
+  background: var(--formula-bg); color: #fff;
+  display: inline-block; padding: 4px 14px;
+  border-radius: 6px; font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem; font-weight: 600; margin-top: 6px;
+}
+
+/* ─── EXERCISE BOX ─── */
+.exercise-box {
+  background: var(--exercise-bg);
+  border: 1.5px solid var(--exercise-border);
+  border-radius: 12px; padding: 24px 28px; margin: 24px 0;
+}
+.exercise-box .box-label {
+  font-size: 0.68rem; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--accent3);
+  font-weight: 700; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.exercise-box .box-label::before { content: '✎'; font-size: 0.9rem; }
+.exercise-box .exercise-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem; font-weight: 700; margin-bottom: 12px;
+}
+.exercise-questions { list-style: none; counter-reset: q; margin: 10px 0; }
+.exercise-questions li {
+  counter-increment: q;
+  display: flex; gap: 12px;
+  margin-bottom: 10px; font-size: 0.95rem;
+}
+.exercise-questions li::before {
+  content: counter(q, lower-alpha) ')';
+  font-weight: 700; color: var(--accent3);
+  min-width: 22px; flex-shrink: 0;
+}
+
+.solution-toggle { margin-top: 18px; }
+.toggle-btn {
+  background: none; border: 2px solid var(--accent3);
+  color: var(--accent3); padding: 8px 20px;
+  border-radius: 20px; font-size: 0.82rem; font-weight: 600;
+  cursor: pointer; letter-spacing: 0.05em; transition: all 0.2s;
+  font-family: 'Source Sans 3', sans-serif;
+}
+.toggle-btn:hover { background: var(--accent3); color: white; }
+.solution-content {
+  display: none; margin-top: 16px;
+  background: rgba(30,132,73,0.08);
+  border-radius: 10px; padding: 18px 22px;
+}
+.solution-content.open { display: block; }
+.solution-content .sol-label {
+  font-size: 0.68rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--accent3);
+  font-weight: 600; margin-bottom: 10px;
+}
+
+/* ─── WARNING BOX ─── */
+.warning-box {
+  background: var(--warning-bg);
+  border-left: 4px solid var(--warning-border);
+  border-radius: 0 10px 10px 0;
+  padding: 18px 22px; margin: 24px 0; font-size: 0.92rem;
+}
+.warning-box .box-label {
+  font-size: 0.67rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--warning-border);
+  font-weight: 600; margin-bottom: 8px;
+}
+
+/* ─── SUMMARY BOX ─── */
+.summary-box {
+  background: var(--ink); color: #e8e8e8;
+  border-radius: 14px; padding: 30px 36px; margin: 40px 0 20px;
+}
+.summary-box .box-label {
+  font-size: 0.68rem; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--gold);
+  font-weight: 600; margin-bottom: 16px;
+}
+.summary-box h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem; color: #fff; margin-bottom: 14px;
+}
+.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+.summary-item { background: rgba(255,255,255,0.06); border-radius: 8px; padding: 12px 16px; }
+.summary-item .si-label { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+.summary-item .si-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.92rem; color: var(--gold); font-weight: 600;
+}
+
+/* ─── TABLE ─── */
+.correction-table {
+  width: 100%; border-collapse: collapse;
+  margin: 20px 0; font-size: 0.9rem;
+  border-radius: 10px; overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+.correction-table thead { background: var(--ink); color: white; }
+.correction-table th {
+  padding: 13px 18px; text-align: left;
+  font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.correction-table td {
+  padding: 11px 18px; border-bottom: 1px solid var(--border);
+  font-size: 0.87rem;
+}
+.correction-table tr:last-child td { border-bottom: none; }
+.correction-table tr:nth-child(even) td { background: rgba(0,0,0,0.02); }
+.col-bin { color: var(--accent2); font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+.col-norm { color: var(--accent3); font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+
+/* ─── RULES LIST ─── */
+.rules-list { list-style: none; margin: 14px 0; }
+.rules-list li {
+  display: flex; align-items: flex-start;
+  gap: 14px; padding: 10px 0;
+  border-bottom: 1px solid var(--border); font-size: 0.95rem;
+}
+.rules-list li:last-child { border-bottom: none; }
+.rule-badge {
+  background: var(--accent); color: white;
+  width: 26px; height: 26px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+}
+
+/* ─── CONDITIONS ─── */
+.conditions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+.condition-card {
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 14px 18px;
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.condition-letter {
+  width: 30px; height: 30px; background: var(--accent2);
+  color: white; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.85rem; flex-shrink: 0;
+}
+.condition-card p { margin: 0; font-size: 0.9rem; line-height: 1.5; }
+
+.section-divider { border: none; border-top: 1px solid var(--border); margin: 60px 0; }
+
+/* ─── FOOTER ─── */
+.page-footer {
+  background: var(--ink); color: rgba(255,255,255,0.4);
+  text-align: center; padding: 30px;
+  font-size: 0.8rem; margin-left: 270px;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 900px) {
+  #sidebar { transform: translateX(-270px); }
+  #sidebar.open { transform: translateX(0); }
+  #main { margin-left: 0; }
+  .page-footer { margin-left: 0; }
+  .content { padding: 40px 28px; }
+  .hero { padding: 50px 28px; }
+  .hero-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.hero h1 { font-size: 2.1rem; }
+  .summary-grid, .conditions-grid { grid-template-columns: 1fr; }
+  #menu-btn { display: flex; }
+}
+#menu-btn {
+  display: none; position: fixed;
+  top: 16px; left: 16px; z-index: 300;
+  background: var(--ink); color: white; border: none;
+  width: 42px; height: 42px; border-radius: 10px;
+  cursor: pointer; align-items: center; justify-content: center; font-size: 1.2rem;
+}
+</style>
+</head>
+<body>
+
+<button id="menu-btn" onclick="toggleSidebar()">☰</button>
+
+<!-- ─── SIDEBAR ─── -->
+<nav id="sidebar">
+  <div class="sidebar-header">
+    <div class="book-label">Matemàtiques · Estadística</div>
+    <h1>Distribucions de Probabilitat</h1>
+    <div class="subtitle">Teoria, exemples i exercicis</div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Introducció</div>
+    <a class="nav-link" href="#variables"><span class="nav-num">0</span>Variables aleatòries</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Distribució Binomial</div>
+    <a class="nav-link" href="#binomial-def"><span class="nav-num">1.1</span>Definició i condicions</a>
+    <a class="nav-link" href="#binomial-formula"><span class="nav-num">1.2</span>Funció de probabilitat</a>
+    <a class="nav-link" href="#binomial-params"><span class="nav-num">1.3</span>Mitjana i desv. típica</a>
+    <a class="nav-link" href="#binomial-exemples"><span class="nav-num">1.4</span>Exemples resolts</a>
+    <a class="nav-link" href="#binomial-exercicis"><span class="nav-num">1.5</span>Exercicis</a>
+    <a class="nav-link" href="#binomial-resum"><span class="nav-num">1.6</span>Resum</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Distribució Normal</div>
+    <a class="nav-link" href="#normal-def"><span class="nav-num">2.1</span>Definició</a>
+    <a class="nav-link" href="#normal-tipif"><span class="nav-num">2.2</span>Tipificació</a>
+    <a class="nav-link" href="#normal-regles"><span class="nav-num">2.3</span>Regles bàsiques</a>
+    <a class="nav-link" href="#normal-exemples"><span class="nav-num">2.4</span>Exemples resolts</a>
+    <a class="nav-link" href="#normal-exercicis"><span class="nav-num">2.5</span>Exercicis</a>
+    <a class="nav-link" href="#normal-percentils"><span class="nav-num">2.6</span>Percentils</a>
+    <a class="nav-link" href="#normal-resum"><span class="nav-num">2.7</span>Resum</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Aproximació</div>
+    <a class="nav-link" href="#aprox-def"><span class="nav-num">3.1</span>Binomial → Normal</a>
+    <a class="nav-link" href="#aprox-correccio"><span class="nav-num">3.2</span>Correcció de continuïtat</a>
+    <a class="nav-link" href="#aprox-exemples"><span class="nav-num">3.3</span>Exemples resolts</a>
+    <a class="nav-link" href="#aprox-exercicis"><span class="nav-num">3.4</span>Exercicis</a>
+  </div>
+</nav>
+
+<!-- ─── MAIN ─── -->
+<div id="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-label">Matemàtiques · Batxillerat</div>
+    <h1>Distribucions de Probabilitat</h1>
+    <p>Teoria completa amb exemples resolts pas a pas i exercicis pràctics per dominar la distribució binomial, la distribució normal i l'aproximació entre elles.</p>
+    <div class="hero-chips">
+      <a class="chip chip-blue" href="#binomial-def">Distribució Binomial</a>
+      <a class="chip chip-red"  href="#normal-def">Distribució Normal</a>
+      <a class="chip chip-green" href="#aprox-def">Aproximació B → N</a>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══════════════════════════ -->
+    <!-- 0. VARIABLES ALEATÒRIES   -->
+    <!-- ══════════════════════════ -->
+    <div id="variables" class="section-header">
+      <div class="section-num">Secció 0</div>
+      <h2>Variables Aleatòries</h2>
+    </div>
+
+    <p>Una <strong>variable aleatòria</strong> associa a cada resultat d'un experiment aleatori un nombre real. No estudiem l'experiment en si, sinó allò que <em>mesurem</em> de cada experiment.</p>
+
+    <div class="conditions-grid">
+      <div class="condition-card">
+        <div class="condition-letter" style="background:var(--accent2)">D</div>
+        <div>
+          <strong>Discretes</strong>
+          <p>Prenen un conjunt finit o numerable de valors, normalment enters.<br><em>Ex: nombre de gols, de defectes…</em></p>
+        </div>
+      </div>
+      <div class="condition-card">
+        <div class="condition-letter" style="background:var(--accent)">C</div>
+        <div>
+          <strong>Contínues</strong>
+          <p>Poden prendre infinits valors dins d'un interval real.<br><em>Ex: temperatura, temps, voltatge…</em></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="warning-box">
+      <div class="box-label">⚠ Propietat fonamental de les v. contínues</div>
+      Per a una variable contínua, la probabilitat d'un valor exacte és sempre zero:
+      \( P(X = x) = 0 \).
+      Sempre calculem probabilitats sobre un <em>interval</em>: \( P(a < X < b) \),
+      que correspon a l'àrea sota la corba de densitat.
+    </div>
+
+    <div class="theory-box">
+      <div class="box-label">Models teòrics principals</div>
+      <ul class="def-list">
+        <li><span class="def-key">B(n,p)</span><span class="def-arrow">→</span>Variable discreta → <strong>Distribució Binomial</strong></li>
+        <li><span class="def-key">N(μ,σ)</span><span class="def-arrow">→</span>Variable contínua → <strong>Distribució Normal</strong></li>
+      </ul>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- ══════════════════════════ -->
+    <!-- 1. DISTRIBUCIÓ BINOMIAL   -->
+    <!-- ══════════════════════════ -->
+    <div id="binomial-def" class="section-header">
+      <div class="section-num">Secció 1 · Distribució Binomial</div>
+      <h2>Definició i Condicions</h2>
+    </div>
+
+    <p>La <strong>distribució binomial</strong> és el model de probabilitat que s'utilitza quan un experiment consisteix a <em>repetir diverses vegades la mateixa prova</em> en condicions idèntiques i independents.</p>
+
+    <div class="theory-box">
+      <div class="box-label">Les 4 condicions de la binomial</div>
+      <div class="conditions-grid" style="margin-top:10px">
+        <div class="condition-card">
+          <div class="condition-letter">a</div>
+          <p>Només hi ha <strong>dos resultats</strong> possibles: Èxit / Fracàs.</p>
+        </div>
+        <div class="condition-card">
+          <div class="condition-letter">b</div>
+          <p>Les proves són <strong>independents</strong> entre si.</p>
+        </div>
+        <div class="condition-card">
+          <div class="condition-letter">c</div>
+          <p>La probabilitat d'èxit és <strong>constant</strong> a cada prova.</p>
+        </div>
+        <div class="condition-card">
+          <div class="condition-letter">d</div>
+          <p>Es realitza un <strong>nombre fix</strong> de proves: \(n\).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="warning-box">
+      <div class="box-label">⚠ Quan NO és binomial</div>
+      <ul style="margin-left:16px; margin-top:4px; font-size:0.92rem; line-height:2.1">
+        <li>Si mesurem una quantitat contínua (temperatura, voltatge, distància…)</li>
+        <li>Si hi ha més de 2 resultats per prova (per exemple, les cares d'un dau: 1, 2, 3, 4, 5, 6)</li>
+        <li>Si s'extreu <strong>sense reposició</strong> de poblacions petites (la probabilitat canvia en cada extracció)</li>
+        <li>Si \(n\) no és fix (per exemple, "fins que surti el primer defecte")</li>
+        <li>Si la probabilitat d'èxit depèn del resultat anterior</li>
+      </ul>
+    </div>
+
+    <!-- FORMULA -->
+    <div id="binomial-formula" class="subsection-header">
+      <h3>1.2 Funció de Probabilitat</h3>
+    </div>
+
+    <p>La probabilitat d'obtenir <strong>exactament \(r\) èxits</strong> en \(n\) proves independents és:</p>
+
+    <div class="formula-box">
+      <div class="formula-label">Fórmula Binomial</div>
+      <div class="formula-display">
+        \[ P(X = r) = \binom{n}{r} \cdot p^r \cdot q^{n-r} \]
+      </div>
+      <div class="formula-parts">
+        <div class="formula-part"><strong>n</strong> nombre total de proves</div>
+        <div class="formula-part"><strong>r</strong> nombre d'èxits desitjats</div>
+        <div class="formula-part"><strong>p</strong> probabilitat d'èxit</div>
+        <div class="formula-part"><strong>q = 1 − p</strong> probabilitat de fracàs</div>
+        <div class="formula-part"><strong>\(\binom{n}{r} = \dfrac{n!}{r!\,(n-r)!}\)</strong></div>
+      </div>
+    </div>
+
+    <div class="theory-box">
+      <div class="box-label">Per què apareix el nombre combinatori?</div>
+      <p>Els \(r\) èxits poden aparèixer en <strong>molts ordres diferents</strong> dins de la seqüència de \(n\) proves. El nombre combinatori \(\binom{n}{r}\) compta totes les maneres de triar \(r\) posicions entre \(n\), sense importar l'ordre.</p>
+      <p style="margin-top:8px; font-size:0.92rem; color:var(--muted)">
+        Exemple: amb \(n = 8\) i \(r = 3\): \(\displaystyle\binom{8}{3} = \frac{8!}{3!\cdot 5!} = 56\) formes de col·locar 3 èxits en 8 proves.
+      </p>
+    </div>
+
+
+    <!-- Binomial bar chart SVG -->
+    <div style="background:white; border:1.5px solid var(--border); border-radius:12px; padding:20px 24px; margin:24px 0;">
+      <div style="font-size:0.68rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent2); font-weight:700; margin-bottom:12px;">Exemple visual · \(B(10, 0{,}3)\) — Funció de probabilitat</div>
+      <svg width="100%" viewBox="0 0 520 180" xmlns="http://www.w3.org/2000/svg" style="font-family:'Source Sans 3',sans-serif;">
+        <!-- axis -->
+        <line x1="50" y1="145" x2="500" y2="145" stroke="#ccc" stroke-width="1.5"/>
+        <line x1="50" y1="15"  x2="50"  y2="148" stroke="#ccc" stroke-width="1.5"/>
+        <!-- bars: B(10,0.3) probabilities for k=0..10 -->
+        <!-- k=0: 0.0282 -->
+        <rect x="58"  y="139" width="28" height="6"   fill="#2471a3" opacity="0.7" rx="2"/>
+        <text x="72"  y="158" text-anchor="middle" font-size="9.5" fill="#666">0</text>
+        <!-- k=1: 0.1211 -->
+        <rect x="98"  y="118" width="28" height="27"  fill="#2471a3" opacity="0.8" rx="2"/>
+        <text x="112" y="158" text-anchor="middle" font-size="9.5" fill="#666">1</text>
+        <!-- k=2: 0.2335 -->
+        <rect x="138" y="92"  width="28" height="53"  fill="#2471a3" opacity="0.9" rx="2"/>
+        <text x="152" y="158" text-anchor="middle" font-size="9.5" fill="#666">2</text>
+        <!-- k=3: 0.2668 — mode -->
+        <rect x="178" y="80"  width="28" height="65"  fill="#c0392b" opacity="0.85" rx="2"/>
+        <text x="192" y="158" text-anchor="middle" font-size="9.5" fill="#c0392b" font-weight="700">3</text>
+        <!-- k=4: 0.2001 -->
+        <rect x="218" y="100" width="28" height="45"  fill="#2471a3" opacity="0.9" rx="2"/>
+        <text x="232" y="158" text-anchor="middle" font-size="9.5" fill="#666">4</text>
+        <!-- k=5: 0.1029 -->
+        <rect x="258" y="123" width="28" height="22"  fill="#2471a3" opacity="0.8" rx="2"/>
+        <text x="272" y="158" text-anchor="middle" font-size="9.5" fill="#666">5</text>
+        <!-- k=6: 0.0368 -->
+        <rect x="298" y="138" width="28" height="7"   fill="#2471a3" opacity="0.7" rx="2"/>
+        <text x="312" y="158" text-anchor="middle" font-size="9.5" fill="#666">6</text>
+        <!-- k=7: 0.0090 -->
+        <rect x="338" y="143" width="28" height="2"   fill="#2471a3" opacity="0.6" rx="2"/>
+        <text x="352" y="158" text-anchor="middle" font-size="9.5" fill="#666">7</text>
+        <!-- k=8..10: tiny -->
+        <text x="392" y="158" text-anchor="middle" font-size="9.5" fill="#666">8+</text>
+        <!-- mu line -->
+        <line x1="192" y1="15" x2="192" y2="145" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.7"/>
+        <!-- labels -->
+        <text x="200" y="25" font-size="10" fill="#c0392b">μ = 3</text>
+        <text x="260" y="170" text-anchor="middle" font-size="10" fill="#888">k (nombre d'èxits)</text>
+        <!-- y-axis label -->
+        <text x="16" y="85" font-size="10" fill="#888" transform="rotate(-90,16,85)">P(X = k)</text>
+        <!-- y ticks -->
+        <line x1="47" y1="80"  x2="53" y2="80"  stroke="#aaa" stroke-width="1"/>
+        <text x="43" y="84"  text-anchor="end" font-size="8.5" fill="#888">0,25</text>
+        <line x1="47" y1="110" x2="53" y2="110" stroke="#aaa" stroke-width="1"/>
+        <text x="43" y="114" text-anchor="end" font-size="8.5" fill="#888">0,15</text>
+        <line x1="47" y1="130" x2="53" y2="130" stroke="#aaa" stroke-width="1"/>
+        <text x="43" y="134" text-anchor="end" font-size="8.5" fill="#888">0,05</text>
+        <text x="260" y="12" text-anchor="middle" font-size="10.5" fill="#1c1c2e" font-weight="700" opacity="0.5">Moda = 3 · Forma asimètrica per p ≠ 0,5</text>
+      </svg>
+    </div>
+    <!-- PARAMS -->
+    <div id="binomial-params" class="subsection-header">
+      <h3>1.3 Mitjana i Desviació Típica</h3>
+    </div>
+
+    <p>Per a una distribució \(X \sim B(n,\, p)\):</p>
+
+    <div class="formula-box">
+      <div class="formula-label">Paràmetres de la Binomial</div>
+      <div class="formula-display">
+        \[
+          \mu = E(X) = n \cdot p
+          \qquad
+          \sigma = \sqrt{n \cdot p \cdot q}
+        \]
+      </div>
+      <div class="formula-parts">
+        <div class="formula-part"><strong>μ</strong> nombre mitjà d'èxits esperats</div>
+        <div class="formula-part"><strong>Var(X) = n·p·q</strong> variància</div>
+        <div class="formula-part"><strong>σ</strong> dispersió al voltant de la mitjana</div>
+      </div>
+    </div>
+
+    <div class="theory-box">
+      <div class="box-label">Interpretació dels paràmetres</div>
+      <ul class="def-list">
+        <li><span class="def-key">μ</span><span class="def-arrow">→</span>Si repetim l'experiment moltes vegades des del principi, de <em>mitjana</em> obtindrem \(\mu\) èxits per experiment.</li>
+        <li><span class="def-key">σ</span><span class="def-arrow">→</span>El resultat habitual oscil·la en l'interval \(\mu \pm \sigma\). Valors molt allunyats d'aquest rang són inusuals.</li>
+      </ul>
+    </div>
+
+    <!-- EXEMPLES BINOMIAL -->
+    <div id="binomial-exemples" class="subsection-header">
+      <h3>1.4 Exemples Resolts</h3>
+    </div>
+
+    <!-- Exemple 1 -->
+    <div class="example-box">
+      <div class="box-label">Exemple 1 · Control de qualitat</div>
+      <div class="example-title">En una línia de producció, el 8% dels articles presenten algun defecte. Es seleccionen 6 articles a l'atzar. Quina és la probabilitat que exactament 2 siguin defectuosos?</div>
+      <div class="example-statement">Èxit: "l'article és defectuós" → \(p = 0{,}08\), \(\;q = 0{,}92\), \(\;n = 6\), \(\;r = 2\)</div>
+      <ul class="solution-steps">
+        <li>Identifiquem: \(X \sim B(6,\; 0{,}08)\), volem \(P(X = 2)\)</li>
+        <li>Apliquem la fórmula: \(\displaystyle P(X=2) = \binom{6}{2} \cdot 0{,}08^2 \cdot 0{,}92^4\)</li>
+        <li>Calculem \(\binom{6}{2} = 15\) i \(0{,}92^4 \approx 0{,}7164\)</li>
+        <li>Resultat: \(15 \cdot 0{,}0064 \cdot 0{,}7164 \approx 0{,}0688\)</li>
+      </ul>
+      <div class="result-highlight">\(P(X = 2) \approx 0{,}069 \;\rightarrow\; 6{,}9\%\)</div>
+    </div>
+
+    <!-- Exemple 2 -->
+    <div class="example-box">
+      <div class="box-label">Exemple 2 · Enquesta telefònica</div>
+      <div class="example-title">En una enquesta, el 35% de les persones declara usar el transport públic diàriament. Truquem a 7 persones. Quina és la probabilitat que almenys 5 l'usin?</div>
+      <div class="example-statement">\(p = 0{,}35\), \(\;q = 0{,}65\), \(\;n = 7\) | Volem \(P(X \geq 5)\)</div>
+      <ul class="solution-steps">
+        <li>Desenvolupem: \(P(X \geq 5) = P(X=5) + P(X=6) + P(X=7)\)</li>
+        <li>\(\displaystyle P(X=5) = \binom{7}{5} \cdot 0{,}35^5 \cdot 0{,}65^2 = 21 \cdot 0{,}005252 \cdot 0{,}4225 \approx 0{,}0466\)</li>
+        <li>\(\displaystyle P(X=6) = \binom{7}{6} \cdot 0{,}35^6 \cdot 0{,}65^1 = 7 \cdot 0{,}001838 \cdot 0{,}65 \approx 0{,}0084\)</li>
+        <li>\(\displaystyle P(X=7) = \binom{7}{7} \cdot 0{,}35^7 = 1 \cdot 0{,}000643 \approx 0{,}0006\)</li>
+        <li>Sumem: \(0{,}0466 + 0{,}0084 + 0{,}0006 = 0{,}0556\)</li>
+      </ul>
+      <div class="result-highlight">\(P(X \geq 5) \approx 0{,}056 \;\rightarrow\; 5{,}6\%\)</div>
+    </div>
+
+    <!-- Exemple 3: suma directa + complementari -->
+    <div class="example-box">
+      <div class="box-label">Exemple 3 · Suma directa de termes</div>
+      <div class="example-title">La probabilitat que un vol arribi amb retard és del 12%. Se seleccionen 9 vols. Quina és la probabilitat que menys de 3 arribin amb retard?</div>
+      <div class="example-statement">\(X \sim B(9,\; 0{,}12)\) | Volem \(P(X &lt; 3) = P(X=0) + P(X=1) + P(X=2)\)</div>
+      <ul class="solution-steps">
+        <li>\(\displaystyle P(X=0) = \binom{9}{0}\cdot 0{,}12^0 \cdot 0{,}88^9 = 0{,}88^9 \approx 0{,}3165\)</li>
+        <li>\(\displaystyle P(X=1) = \binom{9}{1}\cdot 0{,}12^1 \cdot 0{,}88^8 = 9 \cdot 0{,}12 \cdot 0{,}3596 \approx 0{,}3884\)</li>
+        <li>\(\displaystyle P(X=2) = \binom{9}{2}\cdot 0{,}12^2 \cdot 0{,}88^7 = 36 \cdot 0{,}0144 \cdot 0{,}4087 \approx 0{,}2119\)</li>
+        <li>Sumem: \(0{,}3165 + 0{,}3884 + 0{,}2119 = 0{,}9168\)</li>
+      </ul>
+      <div class="result-highlight">\(P(X &lt; 3) \approx 0{,}917 \;\rightarrow\; 91{,}7\%\)</div>
+    </div>
+
+    <!-- Exemple 3b: mètode del complementari correcte -->
+    <div class="example-box">
+      <div class="box-label">Exemple 3b · Mètode del complementari</div>
+      <div class="example-title">Amb la mateixa variable \(X \sim B(9,\; 0{,}12)\): quina és la probabilitat que <em>almenys 1</em> vol arribi amb retard?</div>
+      <div class="example-statement">Volem \(P(X \geq 1)\). El complementari és \(P(X = 0)\), molt més fàcil de calcular.</div>
+      <ul class="solution-steps">
+        <li>Identificar el complementari: \(P(X \geq 1) = 1 - P(X = 0)\)</li>
+        <li>Calcular \(P(X = 0) = 0{,}88^9 \approx 0{,}3165\)</li>
+        <li>Resultat: \(1 - 0{,}3165 = 0{,}6835\)</li>
+      </ul>
+      <div class="result-highlight">\(P(X \geq 1) \approx 0{,}684 \;\rightarrow\; 68{,}4\%\)</div>
+    </div>
+    <div class="theory-box">
+      <div class="box-label">📌 Quan usar el mètode del complementari?</div>
+      <p>El complement és útil quan la condició de l'enunciat és del tipus <strong>"almenys un"</strong>, <strong>"com a mínim un"</strong> o qualsevol cas on el complementari té pocs termes:</p>
+      <ul style="margin: 6px 0 0 18px; font-size:0.92rem; line-height:2">
+        <li>\(P(X \geq 1) = 1 - P(X = 0)\) → <strong>molt útil</strong></li>
+        <li>\(P(X &lt; n) = 1 - P(X = n)\) si n és petit → útil</li>
+        <li>\(P(X &lt; 3)\) amb \(n\) gran → pot ser millor sumar directament 3 termes</li>
+      </ul>
+    </div>
+
+    <!-- Exemple 4: mitj i desv -->
+    <div class="example-box">
+      <div class="box-label">Exemple 4 · Mitjana i Desviació Típica</div>
+      <div class="example-title">En una competició de tir amb arc, la probabilitat d'encertar la diana és del 40%. Un tirador realitza 25 intents. Calcula la mitjana i la desviació típica del nombre d'encerts.</div>
+      <div class="example-statement">\(p = 0{,}40\), \(\;q = 0{,}60\), \(\;n = 25\) | \(X \sim B(25,\; 0{,}40)\)</div>
+      <ul class="solution-steps">
+        <li>Mitjana: \(\mu = n \cdot p = 25 \cdot 0{,}40 = 10\) encerts esperats</li>
+        <li>Desviació típica: \(\sigma = \sqrt{n \cdot p \cdot q} = \sqrt{25 \cdot 0{,}40 \cdot 0{,}60} = \sqrt{6} \approx 2{,}45\)</li>
+        <li>Interpretació: de mitjana s'esperen 10 encerts, i el resultat habitual oscil·la entre \(10 \pm 2{,}45\), és a dir, entre 7{,}5 i 12{,}5 encerts.</li>
+      </ul>
+      <div class="result-highlight">\(\mu = 10 \quad \sigma \approx 2{,}45\)</div>
+    </div>
+
+    <!-- EXERCICIS BINOMIAL -->
+    <div id="binomial-exercicis" class="subsection-header">
+      <h3>1.5 Exercicis</h3>
+    </div>
+
+    <div class="exercise-box">
+      <div class="box-label">Exercici 1</div>
+      <div class="exercise-title">Un metge sap que el 20% dels pacients amb una certa malaltia responen positivament a un nou tractament. Tracta 8 pacients.</div>
+      <ul class="exercise-questions">
+        <li>Quina és la probabilitat que exactament 3 responguin positivament?</li>
+        <li>Quina és la probabilitat que com a màxim 1 respongui positivament?</li>
+        <li>Calcula la mitjana i la desviació típica. Interpreta-les.</li>
+      </ul>
+      <div class="solution-toggle">
+        <button class="toggle-btn" onclick="toggleSolution(this)">▶ Veure solució</button>
+        <div class="solution-content">
+          <div class="sol-label">Solució</div>
+          <p>\(X \sim B(8,\; 0{,}20)\), \(\;q = 0{,}80\)</p>
+          <p><strong>a)</strong> \(\displaystyle P(X=3) = \binom{8}{3} \cdot 0{,}2^3 \cdot 0{,}8^5 = 56 \cdot 0{,}008 \cdot 0{,}3277 \approx \mathbf{0{,}1468}\)</p>
+          <p><strong>b)</strong> \(P(X \leq 1) = P(X=0) + P(X=1)\)</p>
+          <p>\(P(X=0) = 0{,}8^8 \approx 0{,}1678\)</p>
+          <p>\(P(X=1) = 8 \cdot 0{,}2 \cdot 0{,}8^7 = 8 \cdot 0{,}2 \cdot 0{,}2097 \approx 0{,}3355\)</p>
+          <div class="result-highlight">\(P(X \leq 1) \approx 0{,}503 \rightarrow 50{,}3\%\)</div>
+          <p style="margin-top:12px"><strong>c)</strong> \(\mu = 8 \cdot 0{,}2 = \mathbf{1{,}6}\) pacients (de mitjana, 1 o 2 responen bé)</p>
+          <p>\(\sigma = \sqrt{8 \cdot 0{,}2 \cdot 0{,}8} = \sqrt{1{,}28} \approx \mathbf{1{,}13}\)</p>
+          <p>El nombre de respostes positives sol oscil·lar entre 0{,}5 i 2{,}7.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-box">
+      <div class="box-label">Exercici 2</div>
+      <div class="exercise-title">En un videojoc, la probabilitat d'aconseguir un objecte rar en cada intent és del 6%. Un jugador fa 12 intents.</div>
+      <ul class="exercise-questions">
+        <li>Calcula la probabilitat de no obtenir cap objecte rar.</li>
+        <li>Calcula la probabilitat d'obtenir almenys un objecte rar.</li>
+        <li>Calcula la probabilitat d'obtenir exactament 2 objectes rars.</li>
+      </ul>
+      <div class="solution-toggle">
+        <button class="toggle-btn" onclick="toggleSolution(this)">▶ Veure solució</button>
+        <div class="solution-content">
+          <div class="sol-label">Solució</div>
+          <p>\(X \sim B(12,\; 0{,}06)\), \(\;q = 0{,}94\)</p>
+          <p><strong>a)</strong> \(P(X=0) = 0{,}94^{12} \approx \mathbf{0{,}4759}\)</p>
+          <p><strong>b)</strong> \(P(X \geq 1) = 1 - P(X=0) = 1 - 0{,}4759 \approx \mathbf{0{,}5241 \rightarrow 52{,}4\%}\)</p>
+          <p><strong>c)</strong> \(\displaystyle P(X=2) = \binom{12}{2} \cdot 0{,}06^2 \cdot 0{,}94^{10} = 66 \cdot 0{,}0036 \cdot 0{,}5386 \approx \mathbf{0{,}1280}\)</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-box">
+      <div class="box-label">Exercici 3 · És binomial?</div>
+      <div class="exercise-title">Indica si cada situació segueix una distribució binomial. Si és afirmatiu, indica els paràmetres.</div>
+      <ul class="exercise-questions">
+        <li>Es llancen 15 vegades un dau equilibrat. Comptem quantes vegades surt un número parell.</li>
+        <li>D'una bossa amb 4 boles vermelles i 6 de blanques, n'extraiem 5 sense reposició. Comptem les vermelles.</li>
+        <li>En una xarxa social, el 22% dels usuaris publica contingut diari. Observem 50 usuaris a l'atzar.</li>
+        <li>Un jugador llança una moneda fins que surt 3 cares seguides. Comptem el nombre de tirades.</li>
+      </ul>
+      <div class="solution-toggle">
+        <button class="toggle-btn" onclick="toggleSolution(this)">▶ Veure solució</button>
+        <div class="solution-content">
+          <div class="sol-label">Solució</div>
+          <p><strong>a) Sí. \(X \sim B(15,\; 0{,}5)\)</strong> — 2 resultats (parell/imparell), independents, \(p\) constant, \(n = 15\) fix.</p>
+          <p><strong>b) No.</strong> Sense reposició → la probabilitat canvia en cada extracció. Falla la condició (c).</p>
+          <p><strong>c) Sí. \(X \sim B(50,\; 0{,}22)\)</strong> — Població gran → \(p \approx\) constant, \(n = 50\) fix, 2 resultats.</p>
+          <p><strong>d) No.</strong> El nombre de tirades no és fix (falla la condició d). A més, el criteri d'èxit requereix 3 cares <em>seguides</em>, per tant les proves no són independents en el sentit estricte de la binomial.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESUM BINOMIAL -->
+    <div id="binomial-resum">
+      <div class="summary-box">
+        <div class="box-label">Resum · Secció 1</div>
+        <h4>Distribució Binomial \(X \sim B(n, p)\)</h4>
+        <p style="color:rgba(255,255,255,0.65); font-size:0.92rem; margin-bottom:10px">Condicions: 2 resultats · proves independents · p constant · n fix</p>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <div class="si-label">Funció de probabilitat</div>
+            <div class="si-val">\(P(X=r)=\binom{n}{r}p^r q^{n-r}\)</div>
+          </div>
+          <div class="summary-item">
+            <div class="si-label">Nombre combinatori</div>
+            <div class="si-val">\(\binom{n}{r}=\dfrac{n!}{r!(n-r)!}\)</div>
+          </div>
+          <div class="summary-item">
+            <div class="si-label">Mitjana</div>
+            <div class="si-val">\(\mu = n \cdot p\)</div>
+          </div>
+          <div class="summary-item">
+            <div class="si-label">Desviació típica</div>
+            <div class="si-val">\(\sigma = \sqrt{n \cdot p \cdot q}\)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- ══════════════════════════ -->
+    <!-- 2. DISTRIBUCIÓ NORMAL     -->
+    <!-- ══════════════════════════ -->
+    <div id="normal-def" class="section-header">
+      <div class="section-num">Secció 2 · Distribució Normal</div>
+      <h2>Definició i Comportament</h2>
+    </div>
+
+    <p>La <strong>distribució normal</strong> és el model de probabilitat contínua més important. Descriu fenòmens naturals i socials on els valors tendeixen a concentrar-se al voltant d'una mitjana, formant la coneguda <em>campana de Gauss</em>.</p>
+
+    <div class="formula-box">
+      <div class="formula-label">Notació</div>
+      <div class="formula-display">
+        \[ X \sim N(\mu,\; \sigma) \]
+      </div>
+      <div class="formula-parts">
+        <div class="formula-part"><strong>μ</strong> mitjana (centre de la campana)</div>
+        <div class="formula-part"><strong>σ</strong> desviació típica (amplada de la campana)</div>
+      </div>
+    </div>
+
+    <div class="theory-box">
+      <div class="box-label">Comportament estadístic de la Normal</div>
+      <ul class="def-list">
+        <li><span class="def-key">①</span><span class="def-arrow">→</span>La distribució és <strong>simètrica</strong> respecte a la mitjana \(\mu\).</li>
+        <li><span class="def-key">②</span><span class="def-arrow">→</span>La majoria de valors estan concentrats al voltant de \(\mu\).</li>
+        <li><span class="def-key">③</span><span class="def-arrow">→</span>Els valors extrems (molt allunyats de \(\mu\)) tenen probabilitats molt petites.</li>
+        <li><span class="def-key">④</span><span class="def-arrow">→</span>L'àrea total sota la corba és exactament 1.</li>
+      </ul>
+    </div>
+
+
+
+    <div class="theory-box" style="border-left-color:var(--accent2)">
+      <div class="box-label">Regla empírica 68-95-99,7 (regla de les 3σ)</div>
+      <p>En qualsevol distribució normal, la proporció de valors compresos en l'interval \(\mu \pm k\sigma\) és:</p>
+      <ul class="def-list">
+        <li><span class="def-key">±1σ</span><span class="def-arrow">→</span><strong>68%</strong> de les dades estan a l'interval \([\mu - \sigma,\; \mu + \sigma]\)</li>
+        <li><span class="def-key">±2σ</span><span class="def-arrow">→</span><strong>95%</strong> de les dades estan a l'interval \([\mu - 2\sigma,\; \mu + 2\sigma]\)</li>
+        <li><span class="def-key">±3σ</span><span class="def-arrow">→</span><strong>99,7%</strong> de les dades estan a l'interval \([\mu - 3\sigma,\; \mu + 3\sigma]\)</li>
+      </ul>
+      <p style="font-size:0.88rem; color:var(--muted); margin-bottom:0">Equivalentment: \(P(|Z| > 2) \approx 5\%\) i \(P(|Z| > 3) \approx 0{,}3\%\). Valors fora de \(\mu \pm 3\sigma\) es consideren <em>outliers</em>.</p>
+    </div>
+    <!-- Bell curve SVG diagram -->
+    <div style="background:white; border:1.5px solid var(--border); border-radius:12px; padding:20px 24px; margin:24px 0;">
+      <div style="font-size:0.68rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent2); font-weight:700; margin-bottom:12px;">Campana de Gauss · \(N(\mu, \sigma)\)</div>
+      <svg width="100%" viewBox="0 0 580 200" xmlns="http://www.w3.org/2000/svg" style="font-family:'Source Sans 3',sans-serif;">
+        <!-- grid lines -->
+        <line x1="40" y1="170" x2="560" y2="170" stroke="#ddd" stroke-width="1.5"/>
+        <line x1="40" y1="20"  x2="40"  y2="175" stroke="#ddd" stroke-width="1"/>
+        <!-- sigma tick lines -->
+        <line x1="160" y1="168" x2="160" y2="175" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="220" y1="168" x2="220" y2="175" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="290" y1="168" x2="290" y2="175" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="360" y1="168" x2="360" y2="175" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="420" y1="168" x2="420" y2="175" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="490" y1="168" x2="490" y2="175" stroke="#aaa" stroke-width="1.5"/>
+        <!-- tick labels -->
+        <text x="160" y="188" text-anchor="middle" font-size="11" fill="#888">μ−3σ</text>
+        <text x="220" y="188" text-anchor="middle" font-size="11" fill="#888">μ−2σ</text>
+        <text x="290" y="188" text-anchor="middle" font-size="11" fill="#888">μ</text>
+        <text x="360" y="188" text-anchor="middle" font-size="11" fill="#888">μ+2σ</text>
+        <text x="420" y="188" text-anchor="middle" font-size="11" fill="#888">μ+3σ</text>
+        <!-- 68% shaded area (μ±σ = 230..350) -->
+        <path d="M230,170 Q245,35 290,22 Q335,35 350,170 Z" fill="#2471a3" opacity="0.18"/>
+        <!-- 95% shaded area -->
+        <path d="M220,170 Q235,38 290,22 Q345,38 360,170 Z" fill="none"/>
+        <!-- bell curve path -->
+        <path d="M50,168 Q100,167 130,160 Q160,148 190,120 Q220,80 250,42 Q270,24 290,22 Q310,24 330,42 Q350,62 370,90 Q400,130 420,152 Q450,165 490,168 Q520,169 550,170" 
+              stroke="#1c1c2e" stroke-width="2.5" fill="none"/>
+        <!-- 68% fill -->
+        <path d="M230,170 Q240,95 260,52 Q275,30 290,22 Q305,30 320,52 Q340,90 350,170 Z" fill="#2471a3" opacity="0.25"/>
+        <!-- 95% outer fill -->
+        <path d="M220,170 Q228,120 240,85 Q255,50 270,35 Q280,26 290,22 Q300,26 310,35 Q325,52 340,85 Q352,118 360,170 Z" fill="#2471a3" opacity="0.12"/>
+        <!-- lines at μ±σ -->
+        <line x1="230" y1="95" x2="230" y2="170" stroke="#2471a3" stroke-width="1.2" stroke-dasharray="4,3"/>
+        <line x1="350" y1="95" x2="350" y2="170" stroke="#2471a3" stroke-width="1.2" stroke-dasharray="4,3"/>
+        <text x="225" y="188" text-anchor="middle" font-size="11" fill="#2471a3" font-weight="600">μ−σ</text>
+        <text x="355" y="188" text-anchor="middle" font-size="11" fill="#2471a3" font-weight="600">μ+σ</text>
+        <!-- annotation 68% -->
+        <text x="290" y="100" text-anchor="middle" font-size="13" fill="#2471a3" font-weight="700">68%</text>
+        <!-- brackets 95% -->
+        <text x="290" y="140" text-anchor="middle" font-size="11" fill="#1c1c2e" opacity="0.5">95%</text>
+        <!-- brackets 99.7% -->
+        <text x="290" y="158" text-anchor="middle" font-size="10" fill="#1c1c2e" opacity="0.35">99,7%</text>
+        <!-- symmetry arrow -->
+        <line x1="290" y1="20" x2="290" y2="168" stroke="#c0392b" stroke-width="1" stroke-dasharray="5,3" opacity="0.6"/>
+        <text x="295" y="35" font-size="10" fill="#c0392b" opacity="0.8">eix de simetria</text>
+      </svg>
+    </div>
+
+    <div class="warning-box" style="margin-top:0">
+      <div class="box-label">📌 Nota sobre la notació</div>
+      En el currículum de Batxillerat s'utilitza \(N(\mu,\, \sigma)\) on \(\sigma\) és la <strong>desviació típica</strong>. En estadística avançada sovint s'escriu \(N(\mu,\, \sigma^2)\) on \(\sigma^2\) és la <strong>variància</strong>. Atés que les PAU usen \(N(\mu,\, \sigma)\), totes les fórmules d'aquest document segueixen la mateixa convenció.
+    </div>
+    <!-- TIPIFICACIÓ -->
+    <div id="normal-tipif" class="subsection-header">
+      <h3>2.2 Tipificació</h3>
+    </div>
+
+    <p>Com que hi ha infinites normals possibles (un parell \((\mu, \sigma)\) diferent per a cada variable), les taules de probabilitat es construeixen per a la <strong>normal estàndard</strong>: \(Z \sim N(0,\; 1)\).</p>
+
+    <p>Per passar de qualsevol \(X\) a \(Z\) apliquem la <strong>tipificació</strong>:</p>
+
+    <div class="formula-box">
+      <div class="formula-label">Tipificació · Canvi de variable</div>
+      <div class="formula-display">
+        \[ Z = \frac{X - \mu}{\sigma} \]
+      </div>
+      <div class="formula-parts">
+        <div class="formula-part"><strong>Z</strong> variable tipificada \(\sim N(0,1)\)</div>
+        <div class="formula-part"><strong>X</strong> valor original</div>
+        <div class="formula-part"><strong>μ</strong> mitjana de X</div>
+        <div class="formula-part"><strong>σ</strong> desviació típica de X</div>
+      </div>
+    </div>
+
+
+    <div style="background:white; border:1.5px solid var(--border); border-radius:12px; padding:20px 24px; margin:20px 0 0 0;">
+      <div style="font-size:0.68rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent2); font-weight:700; margin-bottom:10px;">Exemple visual · Tipificació</div>
+      <svg width="100%" viewBox="0 0 560 130" xmlns="http://www.w3.org/2000/svg" style="font-family:'Source Sans 3',sans-serif;">
+        <!-- LEFT: X~N(50,10) -->
+        <text x="135" y="14" text-anchor="middle" font-size="11" fill="#1c1c2e" font-weight="700">X ~ N(50, 10)</text>
+        <path d="M20,100 Q50,99 70,92 Q90,78 105,55 Q118,32 130,18 Q142,32 155,55 Q170,78 185,92 Q205,99 235,100" stroke="#2471a3" stroke-width="2" fill="none"/>
+        <path d="M105,100 Q118,35 130,18 Q142,35 155,100 Z" fill="#2471a3" opacity="0.2"/>
+        <line x1="130" y1="16" x2="130" y2="100" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="130" y="112" text-anchor="middle" font-size="10" fill="#c0392b">μ=50</text>
+        <line x1="20" y1="100" x2="240" y2="100" stroke="#ddd" stroke-width="1.5"/>
+        <text x="90"  y="112" text-anchor="middle" font-size="9" fill="#888">30</text>
+        <text x="170" y="112" text-anchor="middle" font-size="9" fill="#888">70</text>
+
+        <!-- ARROW -->
+        <text x="285" y="55" text-anchor="middle" font-size="22" fill="#1c1c2e" opacity="0.4">→</text>
+        <text x="285" y="70" text-anchor="middle" font-size="9.5" fill="#2471a3" font-weight="700">Z = (X−μ)/σ</text>
+
+        <!-- RIGHT: Z~N(0,1) -->
+        <text x="420" y="14" text-anchor="middle" font-size="11" fill="#1c1c2e" font-weight="700">Z ~ N(0, 1)</text>
+        <path d="M305,100 Q335,99 355,92 Q375,78 390,55 Q403,32 415,18 Q427,32 440,55 Q455,78 470,92 Q490,99 520,100" stroke="#1e8449" stroke-width="2" fill="none"/>
+        <path d="M390,100 Q403,35 415,18 Q427,35 440,100 Z" fill="#1e8449" opacity="0.2"/>
+        <line x1="415" y1="16" x2="415" y2="100" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="415" y="112" text-anchor="middle" font-size="10" fill="#c0392b">μ=0</text>
+        <line x1="305" y1="100" x2="525" y2="100" stroke="#ddd" stroke-width="1.5"/>
+        <text x="375" y="112" text-anchor="middle" font-size="9" fill="#888">−2</text>
+        <text x="455" y="112" text-anchor="middle" font-size="9" fill="#888">+2</text>
+      </svg>
+    </div>
+    <div class="theory-box">
+      <div class="box-label">Com llegim la taula de la Normal?</div>
+      <p>La taula dóna sempre la probabilitat acumulada fins a \(z\):</p>
+      <p style="text-align:center; margin: 10px 0">\(\Phi(z) = P(Z < z)\)</p>
+      <p>Per qualsevol altra forma (cua dreta, interval, valor negatiu…) apliquem les regles bàsiques de la secció 2.3.</p>
+    </div>
+
+    <!-- REGLES -->
+    <div id="normal-regles" class="subsection-header">
+      <h3>2.3 Regles Bàsiques</h3>
+    </div>
+
+    <ul class="rules-list">
+      <li><div class="rule-badge">R1</div><div>\(P(Z > z) = 1 - P(Z < z)\) &nbsp;→&nbsp; cua dreta = 1 − cua esquerra</div></li>
+      <li><div class="rule-badge">R2</div><div>\(P(Z < -z) = 1 - P(Z < z)\) &nbsp;→&nbsp; simetria per valors negatius</div></li>
+      <li><div class="rule-badge">R3</div><div>\(P(Z > -z) = P(Z < z)\) &nbsp;→&nbsp; simetria de la normal</div></li>
+      <li><div class="rule-badge">R4</div><div>\(P(a < Z < b) = P(Z < b) - P(Z < a)\) &nbsp;→&nbsp; interval general</div></li>
+      <li><div class="rule-badge">R5</div><div>\(P(-z < Z < z) = 2 \cdot P(Z < z) - 1\) &nbsp;→&nbsp; interval simètric</div></li>
+      <li><div class="rule-badge">R6</div><div>\(P(0 < Z < z) = P(Z < z) - 0{,}5\) &nbsp;→&nbsp; meitat dreta</div></li>
+    </ul>
+
+    <!-- EXEMPLES NORMAL -->
+    <div id="normal-exemples" class="subsection-header">
+      <h3>2.4 Exemples Resolts</h3>
+    </div>
+
+    <div class="example-box">
+      <div class="box-label">Exemple 1 · Normal tipificada</div>
+      <div class="example-title">Sigui \(Z \sim N(0,1)\). Calcula \(P(-1{,}2 < Z < 0{,}9)\).</div>
+      <div class="example-statement">Interval entre dos valors → Regla R4</div>
+      <ul class="solution-steps">
+        <li>Apliquem R4: \(P(-1{,}2 < Z < 0{,}9) = P(Z < 0{,}9) - P(Z < -1{,}2)\)</li>
+        <li>De la taula: \(P(Z < 0{,}9) = 0{,}8159\)</li>
+        <li>Per simetria (R2): \(P(Z < -1{,}2) = 1 - P(Z < 1{,}2) = 1 - 0{,}8849 = 0{,}1151\)</li>
+        <li>Resultat: \(0{,}8159 - 0{,}1151 = 0{,}7008\)</li>
+      </ul>
+      <div class="result-highlight">\(P(-1{,}2 < Z < 0{,}9) \approx 0{,}701 \rightarrow 70{,}1\%\)</div>
+    </div>
+
+    <div class="example-box">
+      <div class="box-label">Exemple 2 · Temperatura de forns industrials</div>
+      <div class="example-title">La temperatura de funcionament d'uns forns industrials segueix \(X \sim N(850,\; 20)\) en graus Celsius. Calcula diverses probabilitats.</div>
+      <div class="example-statement">\(\mu = 850\,°C\), \(\;\sigma = 20\,°C\)</div>
+      <ul class="solution-steps">
+        <li><strong>a) \(P(X < 820)\):</strong> \(\;z = \dfrac{820 - 850}{20} = -1{,}5\)</li>
+        <li>\(P(Z < -1{,}5) = 1 - P(Z < 1{,}5) = 1 - 0{,}9332 = \mathbf{0{,}0668}\)</li>
+        <li><strong>b) \(P(830 < X < 880)\):</strong> \(\;z_1 = \dfrac{830-850}{20} = -1 \quad z_2 = \dfrac{880-850}{20} = 1{,}5\)</li>
+        <li>\(P(Z < -1) = 1 - 0{,}8413 = 0{,}1587 \quad P(Z < 1{,}5) = 0{,}9332\)</li>
+        <li>\(P = 0{,}9332 - 0{,}1587 = \mathbf{0{,}7745}\)</li>
+        <li><strong>c) \(P(X > 900)\):</strong> \(\;z = \dfrac{900-850}{20} = 2{,}5 \quad P(Z > 2{,}5) = 1 - 0{,}9938 = \mathbf{0{,}0062}\)</li>
+      </ul>
+      <div class="result-highlight">a) 6{,}68% &nbsp;|&nbsp; b) 77{,}45% &nbsp;|&nbsp; c) 0{,}62%</div>
+    </div>
+
+    <div class="example-box">
+      <div class="box-label">Exemple 3 · Estimació d'individus</div>
+      <div class="example-title">El consum mensual d'electricitat d'una llar segueix \(X \sim N(310,\; 45)\) kWh. En una urbanització hi ha 800 llars. Quantes consumeixen menys de 260 kWh al mes?</div>
+      <div class="example-statement">\(\mu = 310\), \(\;\sigma = 45\), \(\;N = 800\)</div>
+      <ul class="solution-steps">
+        <li>Tipifiquem: \(z = \dfrac{260 - 310}{45} = -\dfrac{50}{45} \approx -1{,}11\)</li>
+        <li>\(P(X < 260) = P(Z < -1{,}11) = 1 - P(Z < 1{,}11) = 1 - 0{,}8665 = 0{,}1335\)</li>
+        <li>Estimació = \(800 \cdot 0{,}1335 \approx \mathbf{107}\) llars</li>
+      </ul>
+      <div class="result-highlight">\(\approx 107\) llars consumeixen menys de 260 kWh</div>
+    </div>
+
+    <!-- EXERCICIS NORMAL -->
+    <div id="normal-exercicis" class="subsection-header">
+      <h3>2.5 Exercicis</h3>
+    </div>
+
+    <div class="exercise-box">
+      <div class="box-label">Exercici 4 · Normal tipificada</div>
+      <div class="exercise-title">Sigui \(Z \sim N(0,1)\). Calcula:</div>
+      <ul class="exercise-questions">
+        <li>\(P(Z < 1{,}65)\)</li>
+        <li>\(P(Z > -0{,}75)\)</li>
+        <li>\(P(-2 < Z < 1{,}3)\)</li>
+        <li>\(P(Z > 1{,}96)\)</li>
+        <li>Probabilitat que \(Z\) estigui entre \(-1{,}5\) i \(1{,}5\) (interval simètric)</li>
+        <li>Probabilitat que \(Z\) estigui fora de l'interval \([-2,\; 2]\)</li>
+      </ul>
+      <div class="solution-toggle">
+        <button class="toggle-btn" onclick="toggleSolution(this)">▶ Veure solució</button>
+        <div class="solution-content">
+          <div class="sol-label">Solució</div>
+          <p><strong>a)</strong> \(P(Z < 1{,}65) = \mathbf{0{,}9505}\) (directament de la taula)</p>
+          <p><strong>b)</strong> \(P(Z > -0{,}75) = P(Z < 0{,}75) = \mathbf{0{,}7734}\) (regla R3)</p>
+          <p><strong>c)</strong> \(P(Z < -2) = 1 - 0{,}9772 = 0{,}0228\) | \(P(Z < 1{,}3) = 0{,}9032\)</p>
+          <div class="result-highlight">\(P(-2 < Z < 1{,}3) = 0{,}9032 - 0{,}0228 = 0{,}8804\)</div>
+          <p style="margin-top:8px"><strong>d)</strong> \(P(Z > 1{,}96) = 1 - 0{,}9750 = \mathbf{0{,}0250}\)</p>
+          <p><strong>e)</strong> \(P(-1{,}5 < Z < 1{,}5) = 2 \cdot P(Z < 1{,}5) - 1 = 2 \cdot 0{,}9332 - 1 = \mathbf{0{,}8664}\)</p>
+          <p><strong>f)</strong> \(P(-2 < Z < 2) = 2 \cdot 0{,}9772 - 1 = 0{,}9544\)</p>
+          <div class="result-highlight">Fora: \(1 - 0{,}9544 = \mathbf{0{,}0456}\)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-box">
+      <div class="box-label">Exercici 5 · Temps de processament</div>
+      <div class="exercise-title">El temps (en segons) que triga un servidor a processar una sol·licitud segueix \(X \sim N(42,\; 8)\).</div>
+      <ul class="exercise-questions">
+        <li>Probabilitat que una sol·licitud es processi en menys de 35 s.</li>
+        <li>Probabilitat que trigui entre 30 i 50 s.</li>
+        <li>Probabilitat que trigui més de 60 s.</li>
+      </ul>
+      <div class="solution-toggle">
+        <button class="toggle-btn" onclick="toggleSolution(this)">▶ Veure solució</button>
+        <div class="solution-content">
+          <div class="sol-label">Solució</div>
+          <p><strong>a)</strong> \(z = (35-42)/8 = -0{,}875 \approx -0{,}88\)</p>
+          <p>\(P(Z < -0{,}88) = 1 - 0{,}8106 = \mathbf{0{,}1894 \rightarrow 18{,}9\%}\)</p>
+          <p><strong>b)</strong> \(z_1 = (30-42)/8 = -1{,}5 \quad z_2 = (50-42)/8 = 1\)</p>
+          <p>\(P(Z < -1{,}5) = 0{,}0668 \quad P(Z < 1) = 0{,}8413\)</p>
+          <div class="result-highlight">\(P = 0{,}8413 - 0{,}0668 = 0{,}7745 \rightarrow 77{,}5\%\)</div>
+          <p style="margin-top:8px"><strong>c)</strong> \(z = (60-42)/8 = 2{,}25\)</p>
+          <p>\(P(Z > 2{,}25) = 1 - 0{,}9878 = \mathbf{0{,}0122 \rightarrow 1{,}2\%}\)</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-box">
+      <div class="box-label">Exercici 6 · Pes de paquets postals</div>
+      <div class="exercise-title">El pes dels paquets postals d'una empresa segueix \(X \sim N(2{,}4;\; 0{,}6)\) kg. En un dia es processen 3500 paquets.</div>
+      <ul class="exercise-questions">
+        <li>Probabilitat que un paquet pesi més de 3{,}5 kg.</li>
+        <li>Estima quants paquets pesen més de 3{,}5 kg en un dia.</li>
+        <li>Probabilitat que un paquet pesi entre 1{,}8 i 3 kg.</li>
+      </ul>
+      <div class="solution-toggle">
+        <button class="toggle-btn" onclick="toggleSolution(this)">▶ Veure solució</button>
+        <div class="solution-content">
+          <div class="sol-label">Solució</div>
+          <p><strong>a)</strong> \(z = (3{,}5 - 2{,}4)/0{,}6 = 1{,}833 \approx 1{,}83\)</p>
+          <p>\(P(Z > 1{,}83) = 1 - 0{,}9664 = \mathbf{0{,}0336 \rightarrow 3{,}36\%}\)</p>
+          <p><strong>b)</strong> Estimació = \(3500 \cdot 0{,}0336 \approx \mathbf{118}\) paquets</p>
+          <p><strong>c)</strong> \(z_1 = (1{,}8 - 2{,}4)/0{,}6 = -1 \quad z_2 = (3 - 2{,}4)/0{,}6 = 1\)</p>
+          <p>Interval simètric: \(P(-1 < Z < 1) = 2 \cdot 0{,}8413 - 1 = \mathbf{0{,}6826 \rightarrow 68{,}3\%}\)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PERCENTILS -->
+    <div id="normal-percentils" class="subsection-header">
+      <h3>2.6 Percentils a la Distribució Normal</h3>
+    </div>
+
+    <p>El <strong>percentil \(p\)</strong> (amb \(0 < p < 100\)) és el valor \(x_p\) tal que el \(p\%\) de les observacions és menor o igual que \(x_p\):</p>
+
+    <div class="formula-box">
+      <div class="formula-label">Definició i càlcul del percentil</div>
+      <div class="formula-display">
+        \[ P(X \leq x_p) = \frac{p}{100} \]
+      </div>
+      <div class="formula-display" style="font-size:0.95rem">
+        \[ x_p = \mu + z_p \cdot \sigma \]
+      </div>
+      <div class="formula-parts">
+        <div class="formula-part"><strong>Pas 1</strong> Buscar \(z_p\) a la taula: \(P(Z < z_p) = p/100\)</div>
+        <div class="formula-part"><strong>Pas 2</strong> Desfer la tipificació: \(x_p = \mu + z_p \cdot \sigma\)</div>
+      </div>
+    </div>
+
+    <div class="warning-box">
+      <div class="box-label">Nota important</div>
+      El percentil és un <strong>valor</strong> (en les mateixes unitats que \(X\)), no una probabilitat. Parteix la població en dos grups: el \(p\%\) inferior i el \((100-p)\%\) superior. Sempre està associat a un percentatge acumulat.
+    </div>
+
+    <div class="example-box">
+      <div class="box-label">Exemple · Bateries de telèfon</div>
+      <div class="example-title">La durada de les bateries d'un model de telèfon segueix \(X \sim N(36,\; 4)\) mesos. Calcula el percentil 20 i el percentil 90.</div>
+      <div class="example-statement">Volem \(x_{20}\) tal que \(P(X \leq x_{20}) = 0{,}20\) i \(x_{90}\) tal que \(P(X \leq x_{90}) = 0{,}90\)</div>
+      <ul class="solution-steps">
+        <li><strong>Percentil 20:</strong> busquem \(z\) tal que \(P(Z < z) = 0{,}20\) → de la taula (per simetria): \(z \approx -0{,}84\)</li>
+        <li>\(x_{20} = 36 + (-0{,}84) \cdot 4 = 36 - 3{,}36 = 32{,}64\) mesos</li>
+        <li><strong>Percentil 90:</strong> busquem \(z\) tal que \(P(Z < z) = 0{,}90\) → de la taula: \(z \approx 1{,}28\)</li>
+        <li>\(x_{90} = 36 + 1{,}28 \cdot 4 = 36 + 5{,}12 = 41{,}12\) mesos</li>
+      </ul>
+      <div class="result-highlight">P20 = 32{,}64 mesos &nbsp;|&nbsp; P90 = 41{,}12 mesos</div>
+    </div>
+
+    <div class="exercise-box">
+      <div class="box-label">Exercici 7 · Percentils</div>
+      <div class="exercise-title">El voltatge de sortida d'un component electrònic segueix \(X \sim N(5{,}0;\; 0{,}3)\) V.</div>
+      <ul class="exercise-questions">
+        <li>Calcula el percentil 95. Interpreta el resultat.</li>
+        <li>Per sota de quin voltatge es troba el 10% dels components amb menor tensió?</li>
+      </ul>
+      <div class="solution-toggle">
+        <button class="toggle-btn" onclick="toggleSolution(this)">▶ Veure solució</button>
+        <div class="solution-content">
+          <div class="sol-label">Solució</div>
+          <p><strong>a)</strong> \(P(Z < z) = 0{,}95\) → de la taula: \(z \approx 1{,}645\)</p>
+          <p>\(x_{95} = 5{,}0 + 1{,}645 \cdot 0{,}3 = 5{,}49\) V</p>
+          <p>Interpretació: el 95% dels components té un voltatge inferior a 5{,}49 V.</p>
+          <p style="margin-top:10px"><strong>b)</strong> Percentil 10: \(P(Z < z) = 0{,}10\) → per simetria: \(z \approx -1{,}28\)</p>
+          <div class="result-highlight">\(x_{10} = 5{,}0 + (-1{,}28) \cdot 0{,}3 = 4{,}62\) V</div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- RESUM NORMAL -->
+    <div id="normal-resum" style="margin-top:10px">
+      <div class="summary-box">
+        <div class="box-label">Resum · Secció 2</div>
+        <h4>Distribució Normal \(X \sim N(\mu, \sigma)\)</h4>
+        <p style="color:rgba(255,255,255,0.65); font-size:0.92rem; margin-bottom:10px">Contínua · simètrica · campana de Gauss · àrea total = 1</p>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <div class="si-label">Tipificació</div>
+            <div class="si-val">\(Z = \dfrac{X - \mu}{\sigma}\)</div>
+          </div>
+          <div class="summary-item">
+            <div class="si-label">Normal estàndard</div>
+            <div class="si-val">\(Z \sim N(0, 1)\)</div>
+          </div>
+          <div class="summary-item">
+            <div class="si-label">Cua dreta</div>
+            <div class="si-val">\(P(Z > z) = 1 - \Phi(z)\)</div>
+          </div>
+          <div class="summary-item">
+            <div class="si-label">Valor negatiu</div>
+            <div class="si-val">\(P(Z &lt; -z) = 1 - \Phi(z)\)</div>
+          </div>
+          <div class="summary-item">
+            <div class="si-label">Interval simètric</div>
+            <div class="si-val">\(P(-z &lt; Z &lt; z) = 2\Phi(z)-1\)</div>
+          </div>
+          <div class="summary-item">
+            <div class="si-label">Percentil</div>
+            <div class="si-val">\(x_p = \mu + z_p \cdot \sigma\)</div>
+          </div>
+          <div class="summary-item">
+            <div class="si-label">Regla empírica</div>
+            <div class="si-val">±1σ: 68% · ±2σ: 95% · ±3σ: 99,7%</div>
+          </div>
+          <div class="summary-item">
+            <div class="si-label">Estimació individus</div>
+            <div class="si-val">N · P(a &lt; X &lt; b)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- ══════════════════════════════ -->
+    <!-- 3. APROXIMACIÓ B → N          -->
+    <!-- ══════════════════════════════ -->
+    <div id="aprox-def" class="section-header">
+      <div class="section-num">Secció 3 · Aproximació de la Binomial a la Normal</div>
+      <h2>Quan n és Gran</h2>
+    </div>
+
+    <p>Quan \(n\) és prou gran, el càlcul exacte de la binomial es torna molt costós (molts nombres combinatoris). En aquest cas, podem <strong>aproximar la binomial per una normal</strong>:</p>
+
+    <div class="formula-box">
+      <div class="formula-label">Condicions i paràmetres per aproximar B → N</div>
+      <div class="formula-display">
+        \[ np \geq 5 \quad \text{i} \quad nq \geq 5 \]
+      </div>
+      <div class="formula-display" style="font-size:0.95rem">
+        \[
+          \mu = n \cdot p \qquad \sigma = \sqrt{n \cdot p \cdot q} \qquad
+          Z = \frac{X - np}{\sqrt{npq}}
+        \]
+      </div>
+    </div>
+
+    <div class="theory-box">
+      <div class="box-label">Per què funciona?</div>
+      <p>Quan \(n\) augmenta, la distribució binomial (discreta, asimètrica per a \(p \neq 0{,}5\)) s'assembla cada vegada més a una corba de campana. El <strong>Teorema Central del Límit</strong> garanteix aquesta convergència.</p>
+    </div>
+
+    <!-- CORRECCIÓ -->
+    <div id="aprox-correccio" class="subsection-header">
+      <h3>3.2 Correcció de Continuïtat</h3>
+    </div>
+
+    <p>La binomial és <strong>discreta</strong> i la normal és <strong>contínua</strong>. Quan aproximem, cal aplicar la <strong>correcció de continuïtat</strong>: cada valor enter \(k\) es representa com l'interval \([k-0{,}5,\; k+0{,}5]\).</p>
+
+    <table class="correction-table">
+      <thead>
+        <tr><th>Binomial (discreta)</th><th>Normal aproximada (contínua) <span style="font-weight:400;font-size:0.78em;opacity:0.7">± 0,5</span></th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="col-bin">\(P(X = k)\)</td><td class="col-norm">\(P(k-0{,}5 < X < k+0{,}5)\)</td></tr>
+        <tr><td class="col-bin">\(P(X \leq k)\)</td><td class="col-norm">\(P(X < k+0{,}5)\)</td></tr>
+        <tr><td class="col-bin">\(P(X < k)\)</td><td class="col-norm">\(P(X < k-0{,}5)\)</td></tr>
+        <tr><td class="col-bin">\(P(X \geq k)\)</td><td class="col-norm">\(P(X > k-0{,}5)\)</td></tr>
+        <tr><td class="col-bin">\(P(X > k)\)</td><td class="col-norm">\(P(X > k+0{,}5)\)</td></tr>
+        <tr><td class="col-bin">\(P(a \leq X \leq b)\)</td><td class="col-norm">\(P(a-0{,}5 < X < b+0{,}5)\)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="theory-box">
+      <div class="box-label">Lògica de la correcció</div>
+      <ul style="margin: 6px 0 0 18px; font-size:0.93rem; line-height:2.1">
+        <li><strong>\(P(X \leq k)\):</strong> volem incloure tot l'interval de \(k\) → arribem fins a \(k + 0{,}5\)</li>
+        <li><strong>\(P(X < k)\):</strong> no volem incloure \(k\) → ens aturem a \(k - 0{,}5\)</li>
+        <li><strong>\(P(X = k)\):</strong> representa tot l'interval \([k-0{,}5,\; k+0{,}5]\)</li>
+      </ul>
+    </div>
+
+    <!-- EXEMPLES APROXIMACIÓ -->
+    <div id="aprox-exemples" class="subsection-header">
+      <h3>3.3 Exemples Resolts</h3>
+    </div>
+
+    <div class="example-box">
+      <div class="box-label">Exemple 1 · Batecs del cor</div>
+      <div class="example-title">En una prova mèdica, el 3% dels pacients presenten una irregularitat cardíaca lleu. S'examinen 400 pacients.</div>
+      <div class="example-statement">\(X \sim B(400,\; 0{,}03)\)</div>
+      <ul class="solution-steps">
+        <li><strong>a) Justifica l'aproximació:</strong> \(np = 400 \cdot 0{,}03 = 12 \geq 5\) ✓ | \(nq = 400 \cdot 0{,}97 = 388 \geq 5\) ✓</li>
+        <li>\(\mu = 12 \quad \sigma = \sqrt{400 \cdot 0{,}03 \cdot 0{,}97} = \sqrt{11{,}64} \approx 3{,}41\)</li>
+        <li><strong>b) \(P(X \leq 10)\):</strong> correcció → \(P(X < 10{,}5)\) → \(z = \dfrac{10{,}5 - 12}{3{,}41} = -0{,}44\)</li>
+        <li>\(P(Z < -0{,}44) = 1 - 0{,}6700 = \mathbf{0{,}3300}\)</li>
+        <li><strong>c) \(P(X > 16)\):</strong> correcció → \(P(X > 16{,}5)\) → \(z = \dfrac{16{,}5 - 12}{3{,}41} = 1{,}32\)</li>
+        <li>\(P(Z > 1{,}32) = 1 - 0{,}9066 = \mathbf{0{,}0934}\)</li>
+      </ul>
+      <div class="result-highlight">b) 33{,}00% &nbsp;|&nbsp; c) 9{,}34%</div>
+    </div>
+
+    <div class="example-box">
+      <div class="box-label">Exemple 2 · Subscripcions digitals</div>
+      <div class="example-title">En una plataforma de streaming, el 72% dels usuaris renova la subscripció cada any. S'analitzen 200 usuaris.</div>
+      <div class="example-statement">\(X \sim B(200,\; 0{,}72)\)</div>
+      <ul class="solution-steps">
+        <li><strong>a)</strong> \(np = 200 \cdot 0{,}72 = 144 \geq 5\) ✓ | \(nq = 200 \cdot 0{,}28 = 56 \geq 5\) ✓ → Es pot aproximar.</li>
+        <li>\(\mu = 144 \quad \sigma = \sqrt{200 \cdot 0{,}72 \cdot 0{,}28} = \sqrt{40{,}32} \approx 6{,}35\)</li>
+        <li><strong>b) \(P(X \leq 135)\):</strong> correcció → \(P(X < 135{,}5)\) → \(z = \dfrac{135{,}5 - 144}{6{,}35} = -1{,}34\)</li>
+        <li>\(P(Z < -1{,}34) = 1 - 0{,}9099 = \mathbf{0{,}0901}\)</li>
+        <li><strong>c) \(P(140 \leq X \leq 152)\):</strong> correcció → \(P(139{,}5 < X < 152{,}5)\)</li>
+        <li>\(z_1 = (139{,}5-144)/6{,}35 = -0{,}71 \quad z_2 = (152{,}5-144)/6{,}35 = 1{,}34\)</li>
+        <li>\(P(Z < -0{,}71) = 1 - 0{,}7611 = 0{,}2389 \quad P(Z < 1{,}34) = 0{,}9099\)</li>
+        <li>\(P = 0{,}9099 - 0{,}2389 = \mathbf{0{,}6710}\)</li>
+      </ul>
+      <div class="result-highlight">b) 9{,}01% &nbsp;|&nbsp; c) 67{,}10%</div>
+    </div>
+
+    <!-- EXERCICIS APROXIMACIÓ -->
+    <div id="aprox-exercicis" class="subsection-header">
+      <h3>3.4 Exercicis</h3>
+    </div>
+
+    <div class="exercise-box">
+      <div class="box-label">Exercici 8 · Eleccions municipals</div>
+      <div class="exercise-title">En una ciutat, el 48% del cens té intenció de votar a un determinat partit. S'enquesten 300 ciutadans a l'atzar.</div>
+      <ul class="exercise-questions">
+        <li>Justifica si es pot aproximar \(X\) per una normal.</li>
+        <li>Calcula \(P(X > 155)\).</li>
+        <li>Calcula \(P(130 \leq X \leq 160)\).</li>
+      </ul>
+      <div class="solution-toggle">
+        <button class="toggle-btn" onclick="toggleSolution(this)">▶ Veure solució</button>
+        <div class="solution-content">
+          <div class="sol-label">Solució</div>
+          <p>\(X \sim B(300,\; 0{,}48)\)</p>
+          <p><strong>a)</strong> \(np = 300 \cdot 0{,}48 = 144 \geq 5\) ✓ | \(nq = 300 \cdot 0{,}52 = 156 \geq 5\) ✓ → Sí es pot aproximar.</p>
+          <p>\(\mu = 144 \quad \sigma = \sqrt{300 \cdot 0{,}48 \cdot 0{,}52} = \sqrt{74{,}88} \approx 8{,}65\)</p>
+          <p><strong>b)</strong> \(P(X > 155)\) → correcció → \(P(X > 155{,}5)\)</p>
+          <p>\(z = (155{,}5 - 144)/8{,}65 = 1{,}33\)</p>
+          <div class="result-highlight">\(P(Z > 1{,}33) = 1 - 0{,}9082 = 0{,}0918 \rightarrow 9{,}18\%\)</div>
+          <p style="margin-top:10px"><strong>c)</strong> \(P(130 \leq X \leq 160)\) → correcció → \(P(129{,}5 < X < 160{,}5)\)</p>
+          <p>\(z_1 = (129{,}5 - 144)/8{,}65 = -1{,}676 \approx -1{,}68\)</p>
+          <p>\(z_2 = (160{,}5 - 144)/8{,}65 = 1{,}908 \approx 1{,}91\)</p>
+          <p>\(P(Z < -1{,}68) = 1 - 0{,}9535 = 0{,}0465\) | \(P(Z < 1{,}91) = 0{,}9719\)</p>
+          <div class="result-highlight">\(P = 0{,}9719 - 0{,}0465 = 0{,}9254 \rightarrow 92{,}54\%\)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-box">
+      <div class="box-label">Exercici 9 · Defectes en microxips</div>
+      <div class="exercise-title">En una fàbrica de microxips, el 2% dels processadors presenten un defecte microscòpic. S'inspeccionen 500 unitats.</div>
+      <ul class="exercise-questions">
+        <li>Justifica si és adequat aproximar per una normal.</li>
+        <li>Calcula \(P(X \leq 8)\).</li>
+        <li>Calcula \(P(5 \leq X \leq 15)\).</li>
+        <li>Calcula \(P(X = 10)\) amb la correcció de continuïtat.</li>
+      </ul>
+      <div class="solution-toggle">
+        <button class="toggle-btn" onclick="toggleSolution(this)">▶ Veure solució</button>
+        <div class="solution-content">
+          <div class="sol-label">Solució</div>
+          <p>\(X \sim B(500,\; 0{,}02)\)</p>
+          <p><strong>a)</strong> \(np = 500 \cdot 0{,}02 = 10 \geq 5\) ✓ | \(nq = 500 \cdot 0{,}98 = 490 \geq 5\) ✓</p>
+          <p>\(\mu = 10 \quad \sigma = \sqrt{500 \cdot 0{,}02 \cdot 0{,}98} = \sqrt{9{,}8} \approx 3{,}13\)</p>
+          <p><strong>b)</strong> \(P(X \leq 8)\) → correcció → \(P(X < 8{,}5)\) → \(z = (8{,}5-10)/3{,}13 = -0{,}48\)</p>
+          <div class="result-highlight">\(P(Z < -0{,}48) = 1 - 0{,}6844 = 0{,}3156 \rightarrow 31{,}6\%\)</div>
+          <p style="margin-top:8px"><strong>c)</strong> \(P(5 \leq X \leq 15)\) → correcció → \(P(4{,}5 < X < 15{,}5)\)</p>
+          <p>\(z_1 = (4{,}5-10)/3{,}13 = -1{,}76\) | \(z_2 = (15{,}5-10)/3{,}13 = 1{,}76\)</p>
+          <p>Interval simètric: \(P = 2 \cdot 0{,}9608 - 1 = \mathbf{0{,}9216 \rightarrow 92{,}2\%}\)</p>
+          <p style="margin-top:8px"><strong>d)</strong> \(P(X=10)\) → correcció → \(P(9{,}5 < X < 10{,}5)\)</p>
+          <p>\(z_1 = (9{,}5-10)/3{,}13 = -0{,}16\) | \(z_2 = (10{,}5-10)/3{,}13 = 0{,}16\)</p>
+          <div class="result-highlight">\(P = 2 \cdot 0{,}5636 - 1 = 0{,}1272 \rightarrow 12{,}7\%\)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESUM GLOBAL -->
+    <div class="summary-box" style="margin-top:50px">
+      <div class="box-label">Resum Global · Totes les seccions</div>
+      <h4>Guia ràpida per triar el model</h4>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <div class="si-label">Variable discreta · 2 resultats · n fix</div>
+          <div class="si-val">\(X \sim B(n, p)\)</div>
+        </div>
+        <div class="summary-item">
+          <div class="si-label">Variable contínua · campana de Gauss</div>
+          <div class="si-val">\(X \sim N(\mu, \sigma)\)</div>
+        </div>
+        <div class="summary-item">
+          <div class="si-label">Binomial amb \(np \geq 5\) i \(nq \geq 5\)</div>
+          <div class="si-val">B → N + correcció ±0,5</div>
+        </div>
+        <div class="summary-item">
+          <div class="si-label">\(p\%\) observacions \(\leq x_p\)</div>
+          <div class="si-val">\(x_p = \mu + z_p \cdot \sigma\)</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end .content -->
+</div><!-- end #main -->
+
+<footer class="page-footer">
+  Distribucions de Probabilitat · Matemàtiques · Teoria, exemples i exercicis resolts
+</footer>
+
+<script>
+function toggleSolution(btn) {
+  const content = btn.nextElementSibling;
+  if (content.classList.contains('open')) {
+    content.classList.remove('open');
+    btn.textContent = '▶ Veure solució';
+  } else {
+    content.classList.add('open');
+    btn.textContent = '▼ Amagar solució';
+  }
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// Active nav on scroll
+const sections = document.querySelectorAll('[id]');
+const navLinks = document.querySelectorAll('.nav-link');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (s.getBoundingClientRect().top <= 120) current = s.id; });
+  navLinks.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('href') === '#' + current) link.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
